@@ -39,7 +39,7 @@ end
 
 % open storage file
 
-%% MASTER LOOP
+%% Master Loop
 
 CURRENT_ID = 1;
 
@@ -75,7 +75,7 @@ parfor i = 1:5
         
         % Execute arm procedure based on location
         
-        % execureArmMovements(coordinates);
+        % executeArmMovements(coordinates);
         
     end
     
