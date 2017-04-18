@@ -6,6 +6,8 @@ function [] = executeArmMovements(coordinates)
     y = coordinates(2);
     
     
+    
+    
 
 end
 

@@ -3,7 +3,7 @@ function [] = writeData(dataArray)
 %   Detailed explanation goes here
 
 
-    
+    % print out data first for debugging purposes
 
 
 end

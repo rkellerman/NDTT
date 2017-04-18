@@ -81,11 +81,6 @@ parfor i = 1:5
     
 end
 
-% print COMP_measurement data from dataArray(1)
-fprintf('dataArray(2).THICKNESS_data = %d\n', dataArray(2).THICKNESS_data);
-fprintf('dataArray(3).MASS_measurement = %d\n', dataArray(3).MASS_data);
-fprintf('dataArray(4).TOF_measurement = %d\n', dataArray(4).TOF_data);
-
 fprintf('COMPLETED ITERATION\n');
 
 % store dataArray(4) to preserve results, and shift all others along
