@@ -18,7 +18,10 @@ cam = webcam;
 
 % initialize arm
 
-% a = arduino('/dev/cu.usbmodem1411', 'uno','Libraries', 'Servo');
+% a = arduino('/dev/cu.usbmodem1411', 'uno');
+theta1 = 0; 
+theta2 = 270;
+% set the arm to these angles to initialize
 % ... %
 
 % initialize RTR toolbox
@@ -40,8 +43,6 @@ end
 % open storage file
 
 %% Master Loop
-
-CURRENT_ID = 1;
 
 % while (1)  % loop indefinitely, or until system detects an error
 
@@ -75,7 +76,7 @@ parfor i = 1:5
         
         % Execute arm procedure based on location
         
-        % executeArmMovements(coordinates);
+        executeArmMovements(coordinates, a);
         
     end
     
@@ -84,10 +85,9 @@ end
 fprintf('COMPLETED ITERATION\n');
 
 % store dataArray(4) to preserve results, and shift all others along
-dataArray(4).BATCH_ID = CURRENT_ID;
+dataArray(4).BATCH_ID = datestr(now);
 writeData(dataArray);
 
-CURRENT_ID = CURRENT_ID + 1;
 
 for i = 1:3
     dataArray(5 - i) = dataArray(5 - (i + 1));
