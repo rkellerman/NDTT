@@ -1,4 +1,4 @@
-function [] = executeArmMovements(coordinates, a, theta1, theta2)
+function [] = executeArmMovements(coordinates, a)
 %EXECUTEARMMOVEMENTS Summary of this function goes here
 %   Detailed explanation goes here
 
@@ -6,7 +6,14 @@ function [] = executeArmMovements(coordinates, a, theta1, theta2)
 %  pin 3 is stepPin1
 %  pin 4 is enablePin1
 
-%  pin
+%  pin 6 is directionPin2
+%  pin 7 is stepPin2
+%  pin 8 is enablePin2
+
+old_theta1 = 0;
+old_theta2 = 270;
+
+% old thetas are angles for drop off point
 
 x = coordinates(1);
 y = coordinates(2);
@@ -36,6 +43,131 @@ fprintf("theta1 = %f, theta2 = %f\n", theta1, theta2);
 %
 % fprintf("theta1 = %f, theta2 = %f\n", A1, A2);
 
+writeDigitalPin(a, 'D4', 1);
+writeDigitalPin(a, 'D8', 1);
+
+baseSteps = 200;
+
+if (theta1 > old_theta1)
+    numSteps1 = (theta1 - old_theta1) * (baseSteps/360);
+    writeDigitalPin(a, 'D2', 1); 
+else 
+    numSteps1 = (old_theta1 - theta1) * (baseSteps/360);
+    writeDitialPin(a, 'D2', 0);
+end
+
+if (theta2 > old_theta2)
+    numSteps2 = (theta2 - old_theta2) * (baseSteps/360);
+    writeDigitalPin(a, 'D6', 1);
+else 
+    numSteps1 = (old_theta2 - theta2) * (baseSteps/360);
+    writeDigitalPin(a, 'D6', 0);
+end
+
+pause(0.1);
+
+% calculate number of steps to get there for both
+numSteps1 = int8(numSteps1);
+numSteps2 = int8(numSteps2);
+
+if (numSteps1 > numSteps2)
+    for i = 1:numSteps1
+        
+        writeDigitalPin(a, 'D3', 0);
+        writeDigitalPin(a, 'D7', 0);
+        pause(0.01);
+        
+        writeDigitalPin(a, 'D3', 1);
+        if (numSteps2 > 0)
+            writeDigitalPin(a, 'D7', 1);
+            numSteps2 = numSteps2 - 1;
+        end
+        
+        pause(0.01);
+        
+    end
+else 
+    for i = 1:numSteps2
+        
+        writeDigitalPin(a, 'D7', 0);
+        writeDigitalPin(a, 'D3', 0);
+        pause(0.01);
+        
+        writeDigitalPin(a, 'D7', 1);
+        if (numSteps1 > 0)
+            writeDigitalPin(a, 'D3', 1);
+            numSteps1 = numSteps1 - 1;
+        end
+        
+        pause(0.01);
+        
+    end
+end
+
+% activate vacuum
+
+% move to get to pre determined location
+old_theta1 = theta1;
+old_theta2 = theta2;
+
+theta1 = 0;
+theta2 = 270;
+
+if (theta1 > old_theta1)
+    numSteps1 = (theta1 - old_theta1) * (baseSteps/360);
+    writeDigitalPin(a, 'D2', 1); 
+else 
+    numSteps1 = (old_theta1 - theta1) * (baseSteps/360);
+    writeDitialPin(a, 'D2', 0);
+end
+
+if (theta2 > old_theta2)
+    numSteps2 = (theta2 - old_theta2) * (baseSteps/360);
+    writeDigitalPin(a, 'D6', 1);
+else 
+    numSteps1 = (old_theta2 - theta2) * (baseSteps/360);
+    writeDigitalPin(a, 'D6', 0);
+end
+
+pause(0.1);
+
+% calculate number of steps to get there for both
+numSteps1 = int8(numSteps1);
+numSteps2 = int8(numSteps2);
+
+if (numSteps1 > numSteps2)
+    for i = 1:numSteps1
+        
+        writeDigitalPin(a, 'D3', 0);
+        writeDigitalPin(a, 'D7', 0);
+        pause(0.01);
+        
+        writeDigitalPin(a, 'D3', 1);
+        if (numSteps2 > 0)
+            writeDigitalPin(a, 'D7', 1);
+            numSteps2 = numSteps2 - 1;
+        end
+        
+        pause(0.01);
+        
+    end
+else 
+    for i = 1:numSteps2
+        
+        writeDigitalPin(a, 'D7', 0);
+        writeDigitalPin(a, 'D3', 0);
+        pause(0.01);
+        
+        writeDigitalPin(a, 'D7', 1);
+        if (numSteps1 > 0)
+            writeDigitalPin(a, 'D3', 1);
+            numSteps1 = numSteps1 - 1;
+        end
+        
+        pause(0.01);
+        
+    end
+end
 
 
 
