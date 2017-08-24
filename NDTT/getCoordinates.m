@@ -2,69 +2,120 @@ function result = getCoordinates(cam)
 %UNTITLED2 Summary of this function goes here
 %   Detailed explanation goes here
 
-fprintf('I am running!\n'); 
-
+%RGB = imread('pillsetc.png');
 RGB = snapshot(cam);
+% imshow(RGB);
 
-RGB = imcomplement(RGB);
-
-figure;
-imshow(RGB);
-
-% Threshold the image
 I = rgb2gray(RGB);
-bw = im2bw(I);
+bw = imbinarize(I);
+% imshow(bw)
 
-% Remove all object containing fewer than 30 pixels
-bw = bwareaopen(bw, 30);
+% remove all object containing fewer than 30 pixels
+bw = bwareaopen(bw,30);
 
-% % Fill in gaps
-se = strel('disk', 2);
-bw = imclose(bw, se);
+% fill a gap in the pen's cap
+se = strel('disk',2);
+bw = imclose(bw,se);
 
-% % Fill in any holes so that regionprops can be used to
-% % estimate the area enclosed by each of the boundaries
-bw = imfill(bw, 'holes');
+% fill any holes, so that regionprops can be used to estimate
+% the area enclosed by each of the boundaries
+bw = imfill(bw,'holes');
 
-% figure;
-% imshow(bw);
+% imshow(bw)
 
-% Find the boundaries
-[B,L] = bwboundaries(bw, 'noholes');
+[B,L] = bwboundaries(bw,'noholes');
 
-% determine which objects are round
-stats = regionprops(L, 'Area', 'Centroid');
+% Display the label matrix and draw each boundary
+imshow(label2rgb(L, @jet, [.5 .5 .5]))
+hold on
+for k = 1:length(B)
+  boundary = B{k};
+  plot(boundary(:,2), boundary(:,1), 'w', 'LineWidth', 2)
+end
 
+stats = regionprops(L,'Area','Centroid');
+
+threshold = 0.70;
 result = [10000,10000];
 
 % loop over the boundaries
 for k = 1:length(B)
-    
-    % obtain (X,Y) boundary coordinates corresponding to label 'k'
-    boundary = B{k};
-    
-    % compute a simple estimate of the object's perimeter
-    delta_sq = diff(boundary).^2;
-    perimeter = sum(sqrt(sum(delta_sq,2)));
-    
-    % obtain the area calculation coresponding to label k
-    area = stats(k).Area;
-    
-    % compute the roundness metric
-    metric = 4*pi*area/perimeter^2;
-    
-    % mark objects above the threshold with a black circle
-    if metric > .75
-        centroid = stats(k).Centroid;
-        if (centroid(1) < result(1))
+
+  % obtain (X,Y) boundary coordinates corresponding to label 'k'
+  boundary = B{k};
+
+  % compute a simple estimate of the object's perimeter
+  delta_sq = diff(boundary).^2;    
+  perimeter = sum(sqrt(sum(delta_sq,2)));
+  
+  % obtain the area calculation corresponding to label 'k'
+  area = stats(k).Area;
+  
+  % compute the roundness metric
+  metric = 4*pi*area/perimeter^2;
+  
+  % display the results
+  metric_string = sprintf('%2.2f',metric);
+
+  % mark objects above the threshold with a black circle
+  if metric > threshold
+    centroid = stats(k).Centroid;
+    plot(centroid(1),centroid(2),'ko');
+    if (centroid(1) < result(1))
             result = centroid;
-        end
     end
-    
-    
-    
+  end
+  
+  text(boundary(1,2)-35,boundary(1,1)+13,metric_string,'Color','y',...
+       'FontSize',14,'FontWeight','bold');
+  
 end
 
+title(['Metrics closer to 1 indicate that ',...
+       'the object is approximately round']);
 
-end
-
+% % determine which objects are round
+% stats = regionprops(L, 'Area', 'Centroid');
+% 
+% result = [10000,10000];
+% 
+% 
+% % loop over the boundaries
+% for k = 1:length(B)
+%     
+%     % obtain (X,Y) boundary coordinates corresponding to label 'k'
+%     boundary = B{k};
+%     
+%     % compute a simple estimate of the object's perimeter
+%     delta_sq = diff(boundary).^2;
+%     perimeter = sum(sqrt(sum(delta_sq,2)));
+%     
+%     % obtain the area calculation coresponding to label k
+%     area = stats(k).Area;
+%     
+%     % compute the roundness metric
+%     metric = 4*pi*area/perimeter^2;
+%     
+%     % display the results
+%   metric_string = sprintf('%2.2f',metric);
+%     
+%     % mark objects above the threshold with a black circle
+%     if metric > .75
+%         centroid = stats(k).Centroid;
+%         plot(centroid(1),centroid(2),'ko');
+%         if (centroid(1) < result(1))
+%             result = centroid;
+%         end
+%     end
+%     
+%     % Debugging
+%     text(boundary(1,2)-35,boundary(1,1)+13,metric_string,'Color','y',...
+%        'FontSize',14,'FontWeight','bold');
+%     
+%     
+%     
+% end
+% 
+% 
+% end
+% 
